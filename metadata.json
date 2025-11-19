@@ -1,5 +1,5 @@
 {
   "name": "AC/DC Signal Lab",
-  "description": "Interactive AC signal simulator with DC offset, featuring real-time visualization and AI-powered circuit analysis using Gemini 3.0 Pro.",
+  "description": "Interactive AC signal simulator with DC offset, featuring real-time visualization and vector analysis.",
   "requestFramePermissions": []
 }

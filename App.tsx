@@ -4,9 +4,8 @@ import { KnobControl } from './components/KnobControl';
 import { Oscilloscope } from './components/Oscilloscope';
 import { PhasorDiagram } from './components/PhasorDiagram';
 import { PowerTriangleDiagram } from './components/PowerTriangleDiagram';
-import { analyzeCircuit } from './services/geminiService';
 import { INITIAL_STATE } from './constants';
-import { SimulationState, SignalParams, AnalysisResult, Waveform } from './types';
+import { SimulationState, SignalParams, Waveform } from './types';
 
 // Waveform Icon Helper
 const WaveformIcon = ({ type, selected }: { type: Waveform; selected: boolean }) => {
@@ -23,8 +22,6 @@ const WaveformIcon = ({ type, selected }: { type: Waveform; selected: boolean })
 
 const App: React.FC = () => {
   const [state, setState] = useState<SimulationState>(INITIAL_STATE);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [timeOffset, setTimeOffset] = useState(0);
   const [simSpeed, setSimSpeed] = useState(20); // Default to a slow speed (approx 0.05 factor)
   
@@ -72,16 +69,8 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleAnalyze = async () => {
-    setIsAnalyzing(true);
-    const result = await analyzeCircuit(state);
-    setAnalysis(result);
-    setIsAnalyzing(false);
-  };
-
   const resetSimulation = () => {
     setState(INITIAL_STATE);
-    setAnalysis(null);
     setTimeOffset(0);
     setSimSpeed(20);
   };
@@ -309,74 +298,6 @@ const App: React.FC = () => {
 
              {/* 3. Power Triangle */}
              <PowerTriangleDiagram voltage={state.voltage} current={state.current} />
-          </div>
-
-          {/* Row 3: AI Analysis Section */}
-          <div className="bg-gradient-to-r from-gray-900 to-gray-900 border border-gray-700 rounded-xl p-6 relative overflow-hidden">
-             {/* Decorative bg element */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-
-            <div className="flex justify-between items-start mb-4 relative z-10">
-              <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Análisis Gemini 3.0</span>
-                </h2>
-                <p className="text-gray-400 text-sm mt-1">Análisis profundo de circuitos e impedancias.</p>
-              </div>
-              <button
-                onClick={handleAnalyze}
-                disabled={isAnalyzing}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Pensando...
-                  </>
-                ) : (
-                  <>Analizar Circuito</>
-                )}
-              </button>
-            </div>
-
-            {analysis && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
-                <div className="space-y-4">
-                  <div className="bg-black/30 p-3 rounded-lg border border-gray-700/50">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Impedancia (Z)</div>
-                    <div className="text-lg font-mono text-green-400">{analysis.impedance}</div>
-                  </div>
-                   <div className="bg-black/30 p-3 rounded-lg border border-gray-700/50">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Potencia Activa (P)</div>
-                    <div className="text-lg font-mono text-green-400">{analysis.realPower}</div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                   <div className="bg-black/30 p-3 rounded-lg border border-gray-700/50">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Potencia Reactiva (Q)</div>
-                    <div className="text-lg font-mono text-green-400">{analysis.reactivePower}</div>
-                  </div>
-                  <div className="bg-black/30 p-3 rounded-lg border border-gray-700/50">
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Factor de Potencia</div>
-                    <div className="text-lg font-mono text-green-400">{analysis.powerFactor}</div>
-                  </div>
-                </div>
-                <div className="md:col-span-2 bg-blue-900/20 p-4 rounded-lg border border-blue-800/30">
-                  <div className="text-xs text-blue-400 font-bold uppercase mb-2">Perspectiva de Ingeniería</div>
-                  <p className="text-gray-300 text-sm leading-relaxed">{analysis.explanation}</p>
-                </div>
-              </div>
-            )}
-            
-            {!analysis && !isAnalyzing && (
-              <div className="text-center py-8 text-gray-600 italic border-t border-gray-800 mt-2">
-                Ajusta los parámetros y haz clic en "Analizar" para obtener información de la IA.
-              </div>
-            )}
-
           </div>
         </div>
       </main>
