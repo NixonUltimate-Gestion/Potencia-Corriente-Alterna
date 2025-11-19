@@ -14,11 +14,3 @@ export interface SimulationState {
   timeWindow: number; // ms to display
   isPlaying: boolean;
 }
-
-export interface AnalysisResult {
-  impedance?: string;
-  powerFactor?: string;
-  realPower?: string;
-  reactivePower?: string;
-  explanation: string;
-}
